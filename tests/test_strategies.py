@@ -1,19 +1,18 @@
 import numpy as np
+
 from src.strategies import quotes
 
-if __name__ == "__main__":
-    s = 100.0
-    gamma = 0.1
-    sigma = 2.0
-    k = 1.5
-    T = 1.0
-    cases = [(0, 0.0), (1, 0.0), (0, 0.5), (0, 1.0)]
-    for q, t in cases: 
-        bid, ask = quotes(s, q, gamma, sigma, k, T, t)
-        r = (bid + ask) / 2
-        spread = ask - bid
-        print(
-        f"q={q}, t={t}: r={r:.3f}, spread={spread:.3f}, "
-        f"bid={bid:.3f}, ask={ask:.3f}, "
-        f"delta_b={s - bid:.3f}, delta_a={ask - s:.3f}"
-    )
+
+def test_spread_matches_the_paper_formula():
+    gamma, sigma, k = 0.1, 2.0, 1.5
+    for t in (0.0, 0.5, 1.0):
+        bid, ask = quotes(100.0, 0, gamma, sigma, k, 1.0, t)
+        expected = gamma * sigma**2 * (1.0 - t) + (2 / gamma) * np.log(1 + gamma / k)
+        assert abs((ask - bid) - expected) < 1e-12
+        assert abs((bid + ask) / 2 - 100.0) < 1e-12
+
+
+def test_long_inventory_shifts_the_center_down():
+    bid, ask = quotes(100.0, 1, 0.1, 2.0, 1.5, 1.0, 0.0)
+    assert abs((bid + ask) / 2 - 99.6) < 1e-12
+    assert 100.0 - bid > ask - 100.0
