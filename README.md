@@ -112,7 +112,7 @@ The quotes do not depend on $\pi$. The spread is the Avellaneda-Stoikov spread, 
 
 The informed trader is stylized. He cancels when the quote is not through the future mid, rather than hitting a side whenever he has a signal. After $T$, that future mid is frozen at $s_T$.
 
-Each fill is one unit. There are no fees, no latency, and no other market maker. Inventory is unbounded.
+Each fill is one unit. There are no fees and no other market maker. Inventory is unbounded. A quote is also revised with no lag: the next step replaces it before anyone can hit a stale price. Lehalle and Mounjid (2017) show that this lag is a cost of its own. An informed flow can lift a limit order in the time it takes to cancel it.
 
 ## Layout
 
@@ -146,3 +146,5 @@ PYTHONPATH=. python3 experiments/make_figures.py
 ## Reference
 
 Avellaneda, M. and Stoikov, S. (2008). High-frequency trading in a limit order book. *Quantitative Finance* 8(3), 217–224.
+
+Lehalle, C.-A. and Mounjid, O. (2017). Limit order strategic placement with adverse selection risk and the role of latency. *Market Microstructure and Liquidity* 3(1), 1750009.
