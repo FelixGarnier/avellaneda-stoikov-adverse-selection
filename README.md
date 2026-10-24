@@ -30,18 +30,18 @@ Parameters of the paper: \(s_0 = 100\), \(T = 1\), \(\sigma = 2\), \(dt = 0.005\
 
 ## Match to the paper
 
-Seeds 0 for the paths and 1 for the fills. No informed flow. Profit is the mean terminal wealth. The interval is not shown here; the sampling error on the mean is about 0.2 to 0.4.
+Seeds 0 for the paths and 1 for the fills. No informed flow. Profit is the mean terminal wealth. The ± is the 95% half-width, \(1.96\) standard errors.
 
 | \(\gamma\) | Strategy | Spread | Profit | Std(profit) | Std(\(q_T\)) | Paper: profit, std, std(\(q_T\)) |
 |---:|---|---:|---:|---:|---:|---|
-| 0.01 | Inventory | 1.35 | 68.5 | 9.1 | 5.4 | 68.6, 8.7, 5.1 |
-| 0.01 | Symmetric | 1.35 | 68.4 | 13.8 | 9.0 | 68.8, 12.8, 8.7 |
-| 0.1 | Inventory | 1.49 | 64.9 | 6.8 | 3.0 | 65.0, 6.6, 2.9 |
-| 0.1 | Symmetric | 1.49 | 68.2 | 13.3 | 8.6 | 68.4, 12.7, 8.4 |
-| 1 | Inventory | 3.03 | 31.5 | 5.0 | 1.6 | 31.4, 5.0, 1.7 |
-| 1 | Symmetric | 3.03 | 43.4 | 10.4 | 5.2 | 44.0, 11.0, 5.1 |
+| 0.01 | Inventory | 1.35 | 68.5 ± 0.6 | 9.1 | 5.4 | 68.6, 8.7, 5.1 |
+| 0.01 | Symmetric | 1.35 | 68.4 ± 0.9 | 13.8 | 9.0 | 68.8, 12.8, 8.7 |
+| 0.1 | Inventory | 1.49 | 64.9 ± 0.4 | 6.8 | 3.0 | 65.0, 6.6, 2.9 |
+| 0.1 | Symmetric | 1.49 | 68.2 ± 0.8 | 13.3 | 8.6 | 68.4, 12.7, 8.4 |
+| 1 | Inventory | 3.03 | 31.5 ± 0.3 | 5.0 | 1.6 | 31.4, 5.0, 1.7 |
+| 1 | Symmetric | 3.03 | 43.4 ± 0.6 | 10.4 | 5.2 | 44.0, 11.0, 5.1 |
 
-Means sit on the published figures. Standard deviations are within a few percent. At \(\gamma = 0.1\) the symmetric strategy earns about 3 more and carries twice the P&L volatility and almost three times the inventory dispersion. Raising \(\gamma\) widens the spread, cuts the mean, and pins \(q\) down. As \(\gamma \to 0\) the two means meet. The inventory dispersions do not: a small reservation shift is still a pull.
+Means sit on the published figures. Standard deviations differ by a few percent, the same order as the sampling error of a standard deviation on 1,000 paths. The paper estimated its own standard deviations on 1,000 paths as well. The gap is not one-sided: at \(\gamma = 1\) the symmetric standard deviation here is 10.4 against 11.0 in the paper. At \(\gamma = 0.1\) the symmetric strategy earns about 3 more and carries twice the P&L volatility and almost three times the inventory dispersion. Raising \(\gamma\) widens the spread, cuts the mean, and pins \(q\) down. As \(\gamma \to 0\) the two means meet. The inventory dispersions do not: a small reservation shift is still a pull.
 
 ![Mean wealth and terminal-inventory dispersion against risk aversion, with no informed flow](figures/paper_gamma.png)
 
@@ -66,7 +66,7 @@ At \(\gamma = 0.1\), \(\sigma = 2\):
 
 From \(\pi = 0\) to \(\pi = 0.5\), fills fall by about 44% and profit by about half. The surviving trades are worse, not only fewer. At \(\pi = 0\) the symmetric book earns 0.75 per fill, its half-spread. At \(\pi = 0.5\) that edge is 0.63. The inventory strategy was already earning less per fill (0.67), because it leans a quote toward the mid to get out of a position, and it gives up less of that edge (down to 0.60).
 
-At \(\pi = 1\) every remaining fill is toxic by construction, and the mean goes negative. Widening to \(\gamma = 1\) makes the informed condition harder: inventory fills per path fall from 12.7 to 1.3, and the loss shrinks from −3.8 toward zero. The same widening at \(\pi = 0.5\) does not help the mean. Inventory profit goes from 32.9 ± 0.3 at \(\gamma = 0.1\) to 16.2 ± 0.2 at \(\gamma = 1\). The spread cost dominates while uninformed flow is still there.
+At \(\pi = 1\) every remaining fill is toxic by construction, and the mean is negative at every \(\gamma\) in the grid. Raising \(\gamma\) from 0.01 to 1 makes the informed condition harder: inventory fills per path fall from 12.7 to 1.3, and the loss shrinks from −3.8 ± 0.5 to −0.2. At \(\pi = 0.5\) the same widening does not help the mean. Inventory profit goes from 32.9 ± 0.3 at \(\gamma = 0.1\) to 16.2 ± 0.2 at \(\gamma = 1\). The spread cost dominates while uninformed flow is still there. At \(\pi = 0.5\) and \(\gamma = 0.1\), 32.9 ± 0.3 against 32.4 ± 0.7 does not separate the two means.
 
 ## Volatility
 
@@ -74,9 +74,17 @@ At \(\pi = 1\) every remaining fill is toxic by construction, and the mean goes 
 
 ![Mean terminal wealth against volatility, with and without informed flow](figures/pnl_vs_sigma.png)
 
-Without informed flow, a higher \(\sigma\) lowers the mean (inventory profit 68.0, 64.9, 52.6) and tightens inventory (standard deviation of \(q_T\): 4.3, 3.0, 2.1). The reservation shift scales with \(\sigma^2\), so the book leans harder against a position while the mid is more violent. With only informed clients the mean goes the other way: about −0.1 at \(\sigma = 1\), −1.8 at \(\sigma = 2\), and −4.8 ± 0.2 at \(\sigma = 4\) for the inventory strategy. The symmetric book, which does not shade, loses more: −7.8 ± 1.1 at \(\sigma = 4\).
+Without informed flow, a higher \(\sigma\) lowers the mean (inventory profit 68.0, 64.9, 52.6) and tightens inventory (standard deviation of \(q_T\): 4.3, 3.0, 2.1). The reservation shift scales with \(\sigma^2\), so the book leans harder against a position while the mid is more violent. With only informed clients the mean falls as well, from about −0.1 at \(\sigma = 1\) to −1.8 at \(\sigma = 2\) and −4.8 ± 0.2 at \(\sigma = 4\). The mechanism is not the same. Over the horizon \(\tau\), the mid moves like \(\sigma\), while the half-spread grows more slowly, so more informed orders find the quote on the wrong side of the future mid. The symmetric book, which does not shade, loses more at \(\sigma = 4\): −7.8 ± 1.1, against −4.8 ± 0.2.
 
 The spread posted around a reservation price buys a smaller inventory and, once the flow is informed, a smaller loss. It does not buy a higher mean while uninformed clients are still paying the spread.
+
+## Limits
+
+The quotes do not depend on \(\pi\). The spread is the Avellaneda-Stoikov spread, built for uninformed Poisson flow. These runs measure the cost of leaving that rule unchanged once some clients are informed. They are not the best response to \(\pi\). A spread that widens with the informed fraction, in the spirit of Glosten and Milgrom, is the natural next quote.
+
+The \(\sigma\) comparison is tied to \(\tau = 0.1\). What is compared to the half-spread is the move \(\sigma\sqrt{\tau}\). A shorter horizon can push the point where that move exceeds the quote out to a higher volatility. One step, \(\tau = dt\), never triggers an informed trade at these spreads.
+
+The informed trader is stylized. He cancels when the quote is not through the future mid, rather than hitting a side whenever he has a signal. After \(T\), that future mid is frozen at \(s_T\).
 
 ## Layout
 
