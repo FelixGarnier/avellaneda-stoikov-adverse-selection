@@ -43,8 +43,6 @@ Seeds 0 for the paths and 1 for the fills. No informed flow. Profit is the mean 
 
 Means sit on the published figures. Standard deviations differ by a few percent, the same order as the sampling error of a standard deviation on 1,000 paths. The paper estimated its own standard deviations on 1,000 paths as well. The gap is not one-sided: at $\gamma = 1$ the symmetric standard deviation here is 10.4 against 11.0 in the paper. At $\gamma = 0.1$ the symmetric strategy earns about 3 more and carries twice the P&L volatility and almost three times the inventory dispersion. Raising $\gamma$ widens the spread, cuts the mean, and pins $q$ down. As $\gamma \to 0$ the two means meet. The inventory dispersions do not: a small reservation shift is still a pull.
 
-The two strategies share paths and the same random draws, so the last column below is the paired difference, inventory minus symmetric, not a comparison of two separate intervals.
-
 ![Mean wealth and terminal-inventory dispersion against risk aversion, with no informed flow](figures/paper_gamma.png)
 
 ## Informed flow
@@ -53,19 +51,19 @@ A candidate fill, already drawn from $\lambda(\delta)\, dt$, is informed with pr
 
 Horizon $\tau = 0.1$ unless a table says otherwise. One step moves the mid by $\sigma\sqrt{dt} \approx 0.14$, less than a half-spread of about 0.75, so a one-step horizon would never trigger an informed trade.
 
-$\sigma = 2$. The paired column is the mean of the pathwise difference.
+$\sigma = 2$. The two strategies share paths and the same random draws, so Inventory − symmetric is the mean of the pathwise difference, not a comparison of two separate intervals. Fills are the mean number of executions per path. Nine paired intervals are reported. The gaps that carry the reading ($-11.9$, $-5.29$, $-3.28$) are many standard errors wide. One of the smaller intervals could clear zero by chance.
 
-| $\gamma$ | $\pi$ | Inventory | Symmetric | Inventory − symmetric |
-|---:|---:|---:|---:|---:|
-| 0.01 | 0 | 68.5 ± 0.6 | 68.4 ± 0.9 | 0.10 ± 0.51 |
-| 0.01 | 0.5 | 32.3 ± 0.5 | 31.8 ± 0.7 | 0.43 ± 0.38 |
-| 0.01 | 1 | −3.80 ± 0.47 | −4.36 ± 0.63 | 0.56 ± 0.23 |
-| 0.1 | 0 | 64.9 ± 0.4 | 68.2 ± 0.8 | −3.28 ± 0.72 |
-| 0.1 | 0.5 | 32.9 ± 0.3 | 32.4 ± 0.7 | 0.47 ± 0.60 |
-| 0.1 | 1 | −1.77 ± 0.16 | −3.01 ± 0.55 | 1.24 ± 0.47 |
-| 1 | 0 | 31.5 ± 0.3 | 43.4 ± 0.6 | −11.9 ± 0.6 |
-| 1 | 0.5 | 16.2 ± 0.2 | 21.5 ± 0.5 | −5.29 ± 0.40 |
-| 1 | 1 | −0.22 ± 0.03 | 0.00 ± 0.03 | −0.22 ± 0.04 |
+| $\gamma$ | $\pi$ | Inventory | Symmetric | Inv. fills | Sym. fills | Inventory − symmetric |
+|---:|---:|---:|---:|---:|---:|---:|
+| 0.01 | 0 | 68.5 ± 0.6 | 68.4 ± 0.9 | 102.5 | 102.0 | 0.10 ± 0.51 |
+| 0.01 | 0.5 | 32.3 ± 0.5 | 31.8 ± 0.7 | 57.5 | 57.2 | 0.43 ± 0.38 |
+| 0.01 | 1 | −3.80 ± 0.47 | −4.36 ± 0.63 | 12.7 | 13.1 | 0.56 ± 0.23 |
+| 0.1 | 0 | 64.9 ± 0.4 | 68.2 ± 0.8 | 97.2 | 91.6 | −3.28 ± 0.72 |
+| 0.1 | 0.5 | 32.9 ± 0.3 | 32.4 ± 0.7 | 54.4 | 51.2 | 0.47 ± 0.60 |
+| 0.1 | 1 | −1.77 ± 0.16 | −3.01 ± 0.55 | 8.4 | 11.4 | 1.24 ± 0.47 |
+| 1 | 0 | 31.5 ± 0.3 | 43.4 ± 0.6 | 56.2 | 28.8 | −11.9 ± 0.6 |
+| 1 | 0.5 | 16.2 ± 0.2 | 21.5 ± 0.5 | 30.4 | 14.3 | −5.29 ± 0.40 |
+| 1 | 1 | −0.22 ± 0.03 | 0.00 ± 0.03 | 1.31 | 0.12 | −0.22 ± 0.04 |
 
 ![Mean terminal wealth against the informed fraction](figures/pnl_vs_pi.png)
 
@@ -73,7 +71,7 @@ From $\pi = 0$ to $\pi = 0.5$ at $\gamma = 0.1$, fills fall by about 44% and pro
 
 On the paired difference, the symmetric book is ahead when there are no informed clients: $-3.28 \pm 0.72$ at $\gamma = 0.1$. At $\pi = 0.5$ and the same $\gamma$, $0.47 \pm 0.60$ includes zero. The separate intervals $32.9 \pm 0.3$ and $32.4 \pm 0.7$ were already overlapping. The paired interval is tighter and still does not separate them.
 
-At $\pi = 1$ every remaining fill is toxic by construction. Inventory profit is negative at all three risk aversions, including $-0.22 \pm 0.03$ at $\gamma = 1$, which is away from zero. Raising $\gamma$ from 0.01 to 1 cuts inventory fills from 12.7 to 1.3 per path and shrinks the loss from $-3.80 \pm 0.47$ to $-0.22 \pm 0.03$. The symmetric book at $\gamma = 1$ and $\pi = 1$ barely trades (0.1 fill per path) and finishes at $0.00 \pm 0.03$. There the constant wide spread refuses the informed flow, and the inventory book, which still shades and still quotes a time-varying spread, is the one that loses.
+At $\pi = 1$ every remaining fill is toxic by construction. Inventory profit is negative at all three risk aversions, including $-0.22 \pm 0.03$ at $\gamma = 1$, which is away from zero. Raising $\gamma$ from 0.01 to 1 cuts inventory fills from 12.7 to 1.3 per path and shrinks the loss from $-3.80 \pm 0.47$ to $-0.22 \pm 0.03$. The symmetric book at $\gamma = 1$ and $\pi = 1$ finishes at $0.00 \pm 0.03$, with 0.12 fills per path. The inventory book still loses $-0.22 \pm 0.03$. Its spread falls through time, from about 4.6 in the first fifth of $[0, T]$ to 1.4 in the last, while the symmetric book stays at the constant average 3.03. Counted by fifths, inventory fills on 1,000 paths are 0, 4, 69, 333, and 906. Sixty-nine percent fall in the last fifth, where the half-spread approaches $\sigma\sqrt{\tau} = 0.63$ and then goes under it. The symmetric fills are flat: 28, 26, 31, 20, 20. The book that tightens into the close is the one the informed traders hit. The book that stays wide almost does not trade.
 
 At $\pi = 0.5$ the same widening does not help the inventory mean: $32.9 \pm 0.3$ at $\gamma = 0.1$, then $16.2 \pm 0.2$ at $\gamma = 1$. The spread cost dominates while uninformed flow is still there. The paired gap there is $-5.29 \pm 0.40$: the symmetric book earns more.
 
@@ -85,7 +83,7 @@ $\gamma = 0.1$, $\tau = 0.1$. Paths are redrawn at each $\sigma$ with seed 0, so
 
 Without informed flow, a higher $\sigma$ lowers the mean (inventory profit 68.0, 64.9, 52.6) and tightens inventory (standard deviation of $q_T$: 4.3, 3.0, 2.1). The reservation shift scales with $\sigma^2$, so the book leans harder against a position while the mid is more violent. With only informed clients the mean falls as well, from about $-0.1$ at $\sigma = 1$ to $-1.77 \pm 0.16$ at $\sigma = 2$ and $-4.80 \pm 0.24$ at $\sigma = 4$. The mechanism is not the same. Over the horizon $\tau$, the mid moves like $\sigma$, while the half-spread grows more slowly, so more informed orders find the quote on the wrong side of the future mid. At $\sigma = 4$ the paired gap is $3.00 \pm 1.06$: the symmetric book loses more.
 
-The spread posted around a reservation price buys a smaller inventory. It buys a smaller loss against informed flow at $\gamma = 0.1$, not at every parameter. It does not buy a higher mean while uninformed clients are still paying the spread.
+The spread posted around a reservation price buys a smaller inventory. At $\gamma = 0.1$ and $\tau = 0.1$ it also buys a smaller loss against informed flow. That does not hold at every horizon: at $\tau = 0.05$ and $\sigma = 4$ the inventory loss is $-3.31 \pm 0.18$ against $-2.84 \pm 0.76$ for the symmetric book. It does not buy a higher mean while uninformed clients are still paying the spread.
 
 ## Horizon of the informed trader
 
@@ -108,6 +106,8 @@ The quotes do not depend on $\pi$. The spread is the Avellaneda-Stoikov spread, 
 
 The informed trader is stylized. He cancels when the quote is not through the future mid, rather than hitting a side whenever he has a signal. After $T$, that future mid is frozen at $s_T$.
 
+Each fill is one unit. There are no fees, no latency, and no other market maker. Inventory is unbounded.
+
 ## Layout
 
 | Path | Role |
@@ -119,6 +119,7 @@ The informed trader is stylized. He cancels when the quote is not through the fu
 | `experiments/grid_gamma_pi.py` | $\gamma \in \{0.01, 0.1, 1\}$, $\pi \in \{0, 0.5, 1\}$, $\sigma = 2$. |
 | `experiments/grid_sigma.py` | $\sigma \in \{1, 2, 4\}$, same $\pi$ grid, $\gamma = 0.1$. |
 | `experiments/grid_tau.py` | $\tau \in \{0.05, 0.1, 0.2\}$ at $\pi = 1$, for $\sigma = 2$ and $\sigma = 4$. |
+| `experiments/fills_by_time.py` | Informed fills by fifth of $[0, T]$ at $\gamma = 1$, $\pi = 1$. |
 | `experiments/make_figures.py` | The three figures in this note. |
 | `tests/` | Pytest checks for the random walk, fill rates, quotes, and accounting. |
 
@@ -130,6 +131,7 @@ PYTHONPATH=. pytest
 PYTHONPATH=. python3 experiments/grid_gamma_pi.py
 PYTHONPATH=. python3 experiments/grid_sigma.py
 PYTHONPATH=. python3 experiments/grid_tau.py
+PYTHONPATH=. python3 experiments/fills_by_time.py
 PYTHONPATH=. python3 experiments/make_figures.py
 ```
 
