@@ -67,7 +67,7 @@ $\sigma = 2$. The two strategies share paths and the same random draws, so Inven
 | 1 | 0.5 | 16.2 ± 0.2 | 21.5 ± 0.5 | 30.4 | 14.3 | −5.29 ± 0.40 |
 | 1 | 1 | −0.22 ± 0.03 | 0.00 ± 0.03 | 1.31 | 0.12 | −0.22 ± 0.04 |
 
-![Mean terminal wealth against the informed fraction](figures/pnl_vs_pi.png)
+![Mean wealth and terminal-inventory dispersion against the informed fraction](figures/pnl_vs_pi.png)
 
 From $\pi = 0$ to $\pi = 0.5$ at $\gamma = 0.1$, fills fall by about 44% and profit by about half. The surviving trades are worse, not only fewer. At $\pi = 0$ the symmetric book earns 0.75 per fill, its half-spread. At $\pi = 0.5$ that edge is 0.63. The inventory strategy was already earning less per fill (0.67), because it leans a quote toward the mid to get out of a position, and it gives up less of that edge (down to 0.60).
 
@@ -104,6 +104,8 @@ $\pi = 1$, $\gamma = 0.1$. Same seeds as the other grids.
 
 Lengthening $\tau$ deepens the loss. The symmetric book is the one that deteriorates fast once the horizon is 0.1 or 0.2. A shorter horizon does not remove the loss: at $\tau = 0.05$ both means are still negative, and at $\sigma = 4$ they are already about $-3$. The scale $\sigma\sqrt{\tau}$ is a guide, not a hard threshold, because the move is random.
 
+![Mean terminal wealth against the informed horizon, at two volatilities](figures/pnl_vs_tau.png)
+
 ## Limits
 
 The quotes do not depend on $\pi$. The spread is the Avellaneda-Stoikov spread, built for uninformed Poisson flow. These runs measure the cost of leaving that rule unchanged once some clients are informed. They are not the best response to $\pi$. A spread that widens with the informed fraction, in the spirit of Glosten and Milgrom, is the natural next quote.
@@ -124,7 +126,7 @@ Each fill is one unit. There are no fees, no latency, and no other market maker.
 | `experiments/grid_sigma.py` | $\sigma \in \{1, 2, 4\}$, same $\pi$ grid, $\gamma = 0.1$. |
 | `experiments/grid_tau.py` | $\tau \in \{0.05, 0.1, 0.2\}$ at $\pi = 1$, for $\sigma = 2$ and $\sigma = 4$. |
 | `experiments/fills_by_time.py` | Informed fills by fifth of $[0, T]$ at $\gamma = 1$, $\pi = 1$. |
-| `experiments/make_figures.py` | The four figures in this note. |
+| `experiments/make_figures.py` | The five figures in this note. |
 | `tests/` | Pytest checks for the random walk, fill rates, quotes, and accounting. |
 
 ## Run

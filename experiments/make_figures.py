@@ -2,8 +2,9 @@
 
 Outputs, under figures/:
     paper_gamma.png    mean P&L and terminal-inventory dispersion versus gamma
-    pnl_vs_pi.png      mean P&L versus the informed fraction
+    pnl_vs_pi.png      mean P&L and inventory dispersion versus the informed fraction
     pnl_vs_sigma.png   mean P&L versus volatility, with and without informed flow
+    pnl_vs_tau.png     mean P&L versus the informed horizon
     fills_by_time.png  informed fills by fifth of the horizon
 """
 
@@ -31,15 +32,15 @@ def half_width(x):
     return 1.96 * np.std(x) / np.sqrt(len(x))
 
 
-def one_cell(paths, sigma, gamma, pi):
+def one_cell(paths, sigma, gamma, pi, tau=TAU):
     pnl, q, fills, spread = run_inventory(
         paths, gamma=gamma, sigma=sigma, k=K, A=A, T=T, dt=DT,
-        rng=np.random.default_rng(1), pi=pi, tau=TAU,
+        rng=np.random.default_rng(1), pi=pi, tau=tau,
         rng_info=np.random.default_rng(2),
     )
     pnl_s, q_s, fills_s, _ = run_symmetric(
         paths, spread, A=A, k=K, dt=DT,
-        rng=np.random.default_rng(1), pi=pi, tau=TAU,
+        rng=np.random.default_rng(1), pi=pi, tau=tau,
         rng_info=np.random.default_rng(2),
     )
     return {
@@ -105,22 +106,58 @@ def paper_gamma(by_gamma):
 
 def pnl_vs_pi(by_gamma):
     pis = [0.0, 0.5, 1.0]
-    fig, ax = plt.subplots(figsize=(5.6, 3.6))
-    for name, color in (("inventory", INV), ("symmetric", SYM)):
-        y = [by_gamma[0.1][pi][name][0] for pi in pis]
-        yerr = [by_gamma[0.1][pi][name][1] for pi in pis]
-        ax.errorbar(
-            pis, y, yerr=yerr, color=color, marker="o",
-            linewidth=1.6, capsize=3, label=name.capitalize(),
-        )
-    ax.axhline(0.0, color="#666666", linewidth=0.8)
-    ax.set_xticks(pis, ["0", "0.5", "1"])
-    ax.set_xlabel(r"Informed fraction $\pi$")
-    ax.set_ylabel("Mean terminal wealth")
-    ax.set_title(r"$\gamma = 0.1$, $\sigma = 2$, $\tau = 0.1$")
-    ax.legend()
+    fig, axes = plt.subplots(1, 2, figsize=(8.4, 3.6))
+    for ax, metric, ylabel, title in (
+        (axes[0], 0, "Mean terminal wealth", r"Profit, $\gamma = 0.1$, $\sigma = 2$"),
+        (axes[1], 2, "Std of terminal inventory", r"Inventory, $\tau = 0.1$"),
+    ):
+        for name, color in (("inventory", INV), ("symmetric", SYM)):
+            y = [by_gamma[0.1][pi][name][metric] for pi in pis]
+            yerr = None if metric == 2 else [by_gamma[0.1][pi][name][1] for pi in pis]
+            ax.errorbar(
+                pis, y, yerr=yerr, color=color, marker="o",
+                linewidth=1.6, capsize=3, label=name.capitalize(),
+            )
+        ax.set_xticks(pis, ["0", "0.5", "1"])
+        ax.set_xlabel(r"Informed fraction $\pi$")
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
+    axes[0].axhline(0.0, color="#666666", linewidth=0.8)
+    axes[0].legend()
     fig.tight_layout()
     fig.savefig(FIG / "pnl_vs_pi.png", dpi=160, bbox_inches="tight")
+    plt.close(fig)
+
+
+def collect_tau():
+    out = {}
+    for sigma in (2.0, 4.0):
+        paths = simulate_mid_price(S0, sigma, T, DT, N_PATHS, np.random.default_rng(0))
+        out[sigma] = {
+            tau: one_cell(paths, sigma, 0.1, 1.0, tau) for tau in (0.05, 0.1, 0.2)
+        }
+    return out
+
+
+def pnl_vs_tau(by_tau):
+    taus = [0.05, 0.1, 0.2]
+    fig, axes = plt.subplots(1, 2, figsize=(8.4, 3.6))
+    for ax, sigma in ((axes[0], 2.0), (axes[1], 4.0)):
+        for name, color in (("inventory", INV), ("symmetric", SYM)):
+            y = [by_tau[sigma][tau][name][0] for tau in taus]
+            yerr = [by_tau[sigma][tau][name][1] for tau in taus]
+            ax.errorbar(
+                taus, y, yerr=yerr, color=color, marker="o",
+                linewidth=1.6, capsize=3, label=name.capitalize(),
+            )
+        ax.axhline(0.0, color="#666666", linewidth=0.8)
+        ax.set_xticks(taus, ["0.05", "0.1", "0.2"])
+        ax.set_xlabel(r"Informed horizon $\tau$")
+        ax.set_title(rf"$\pi = 1$, $\gamma = 0.1$, $\sigma = {sigma:g}$")
+    axes[0].set_ylabel("Mean terminal wealth")
+    axes[0].legend()
+    fig.tight_layout()
+    fig.savefig(FIG / "pnl_vs_tau.png", dpi=160, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -174,6 +211,7 @@ def main():
     paper_gamma(by_gamma)
     pnl_vs_pi(by_gamma)
     pnl_vs_sigma(by_sigma)
+    pnl_vs_tau(collect_tau())
     fills_by_time()
     print(f"wrote figures in {FIG}")
 
