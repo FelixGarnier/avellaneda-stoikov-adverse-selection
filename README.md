@@ -4,6 +4,8 @@ A discrete-time simulation of Avellaneda and Stoikov (2008), and a controlled co
 
 NumPy only. The mid is an arithmetic random walk. Execution probabilities are Bernoulli. One thousand paths, fixed seeds.
 
+At $\gamma = 0.1$ with no informed flow, inventory control costs $3.3 \pm 0.7$ of mean profit and cuts P&L volatility by about half. With informed clients that profit gap is gone at $\pi = 0.5$, and the inventory loss is the smaller one at $\pi = 1$ when $\tau \ge 0.1$. At $\gamma = 1$ and $\pi = 1$, the spread that tightens into the close is where informed flow hits. The baseline, posted at a constant wide spread, barely trades.
+
 ## Quotes
 
 The mid has no drift. Over a step of length $dt$ it moves by $\pm \sigma \sqrt{dt}$.
@@ -73,6 +75,8 @@ On the paired difference, the symmetric book is ahead when there are no informed
 
 At $\pi = 1$ every remaining fill is toxic by construction. Inventory profit is negative at all three risk aversions, including $-0.22 \pm 0.03$ at $\gamma = 1$, which is away from zero. Raising $\gamma$ from 0.01 to 1 cuts inventory fills from 12.7 to 1.3 per path and shrinks the loss from $-3.80 \pm 0.47$ to $-0.22 \pm 0.03$. The symmetric book at $\gamma = 1$ and $\pi = 1$ finishes at $0.00 \pm 0.03$, with 0.12 fills per path. The inventory book still loses $-0.22 \pm 0.03$. Its spread falls through time, from about 4.6 in the first fifth of $[0, T]$ to 1.4 in the last, while the symmetric book stays at the constant average 3.03. Counted by fifths, inventory fills on 1,000 paths are 0, 4, 69, 333, and 906. Sixty-nine percent fall in the last fifth, where the half-spread approaches $\sigma\sqrt{\tau} = 0.63$ and then goes under it. The symmetric fills are flat: 28, 26, 31, 20, 20. The book that tightens into the close is the one the informed traders hit. The book that stays wide almost does not trade.
 
+![Informed fills by fifth of the horizon, inventory against the symmetric book](figures/fills_by_time.png)
+
 At $\pi = 0.5$ the same widening does not help the inventory mean: $32.9 \pm 0.3$ at $\gamma = 0.1$, then $16.2 \pm 0.2$ at $\gamma = 1$. The spread cost dominates while uninformed flow is still there. The paired gap there is $-5.29 \pm 0.40$: the symmetric book earns more.
 
 ## Volatility
@@ -120,7 +124,7 @@ Each fill is one unit. There are no fees, no latency, and no other market maker.
 | `experiments/grid_sigma.py` | $\sigma \in \{1, 2, 4\}$, same $\pi$ grid, $\gamma = 0.1$. |
 | `experiments/grid_tau.py` | $\tau \in \{0.05, 0.1, 0.2\}$ at $\pi = 1$, for $\sigma = 2$ and $\sigma = 4$. |
 | `experiments/fills_by_time.py` | Informed fills by fifth of $[0, T]$ at $\gamma = 1$, $\pi = 1$. |
-| `experiments/make_figures.py` | The three figures in this note. |
+| `experiments/make_figures.py` | The four figures in this note. |
 | `tests/` | Pytest checks for the random walk, fill rates, quotes, and accounting. |
 
 ## Run

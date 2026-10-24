@@ -1,9 +1,10 @@
-"""Write the three README figures from the same seeds as the grids.
+"""Write the README figures from the same seeds as the grids.
 
 Outputs, under figures/:
-    paper_gamma.png   mean P&L and terminal-inventory dispersion versus gamma
-    pnl_vs_pi.png     mean P&L versus the informed fraction
-    pnl_vs_sigma.png  mean P&L versus volatility, with and without informed flow
+    paper_gamma.png    mean P&L and terminal-inventory dispersion versus gamma
+    pnl_vs_pi.png      mean P&L versus the informed fraction
+    pnl_vs_sigma.png   mean P&L versus volatility, with and without informed flow
+    fills_by_time.png  informed fills by fifth of the horizon
 """
 
 from pathlib import Path
@@ -11,6 +12,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
+from fills_by_time import counts
 from src.price import simulate_mid_price
 from src.simulator import run_inventory, run_symmetric
 
@@ -147,6 +149,24 @@ def pnl_vs_sigma(by_sigma):
     plt.close(fig)
 
 
+def fills_by_time():
+    inv, sym, _ = counts()
+    labels = ["0–0.2", "0.2–0.4", "0.4–0.6", "0.6–0.8", "0.8–1"]
+    x = np.arange(len(labels))
+    width = 0.36
+    fig, ax = plt.subplots(figsize=(6.4, 3.6))
+    ax.bar(x - width / 2, inv, width, color=INV, label="Inventory")
+    ax.bar(x + width / 2, sym, width, color=SYM, label="Symmetric")
+    ax.set_xticks(x, labels)
+    ax.set_xlabel(r"Fraction of the horizon $[0, T]$")
+    ax.set_ylabel("Fills on 1,000 paths")
+    ax.set_title(r"Informed fills by time, $\gamma = 1$, $\pi = 1$, $\sigma = 2$")
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(FIG / "fills_by_time.png", dpi=160, bbox_inches="tight")
+    plt.close(fig)
+
+
 def main():
     FIG.mkdir(exist_ok=True)
     style()
@@ -154,6 +174,7 @@ def main():
     paper_gamma(by_gamma)
     pnl_vs_pi(by_gamma)
     pnl_vs_sigma(by_sigma)
+    fills_by_time()
     print(f"wrote figures in {FIG}")
 
 

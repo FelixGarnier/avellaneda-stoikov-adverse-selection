@@ -20,7 +20,8 @@ def bin_of(t):
     return min(int(t / (T / N_BINS)), N_BINS - 1)
 
 
-def main():
+def counts():
+    """Return inventory fills, symmetric fills, and mean spread by fifth."""
     paths = simulate_mid_price(S0, SIGMA, T, DT, N_PATHS, np.random.default_rng(0))
     n_steps = paths.shape[1] - 1
     n_tau = int(round(TAU / DT))
@@ -67,11 +68,16 @@ def main():
         )
         sym_fills[bin_of(t)] += bid_filled.sum() + ask_filled.sum()
 
-    print(f"mean spread {mean_spread:.2f}")
+    return inv_fills, sym_fills, spread_sum / spread_count
+
+
+def main():
+    inv_fills, sym_fills, spreads = counts()
+    print(f"mean spread {spreads.mean():.2f}")
     print("fifth  spread  inv_fills  sym_fills")
     for b in range(N_BINS):
         print(
-            f"{b + 1:5d}  {spread_sum[b] / spread_count[b]:6.2f}  "
+            f"{b + 1:5d}  {spreads[b]:6.2f}  "
             f"{inv_fills[b]:9.0f}  {sym_fills[b]:9.0f}"
         )
 
