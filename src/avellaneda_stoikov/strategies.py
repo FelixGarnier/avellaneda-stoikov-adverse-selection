@@ -36,3 +36,16 @@ def quotes(s, q, gamma, sigma, k, T, t):
     bid = r - spread / 2
     ask = r + spread / 2
     return bid, ask
+
+
+def quotes_noskew(s, gamma, sigma, k, T, t):
+    """Bid and ask with the same spread as ``quotes``, centered on the mid.
+
+    These are the quotes of the inventory strategy at zero inventory. The
+    spread still declines toward ``T``, but a position does not move it.
+
+    Returns
+    -------
+    bid, ask : float or ndarray
+    """
+    return quotes(s, 0.0, gamma, sigma, k, T, t)

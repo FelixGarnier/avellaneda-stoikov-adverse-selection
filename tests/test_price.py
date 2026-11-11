@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.price import simulate_mid_price
+from avellaneda_stoikov.price import simulate_mid_price
 
 
 def test_shape_and_initial_column():

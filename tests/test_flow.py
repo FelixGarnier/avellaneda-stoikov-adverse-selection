@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.flow import apply_fills, draw_fills, keep_fills
+from avellaneda_stoikov.flow import apply_fills, draw_fills, keep_fills
 
 
 def test_fill_frequency_matches_intensity():

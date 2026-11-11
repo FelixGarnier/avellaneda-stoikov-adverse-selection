@@ -1,9 +1,9 @@
-"""Pathwise simulators for the inventory strategy and the symmetric benchmark."""
+"""Pathwise simulators for the inventory, no-skew, and symmetric books."""
 
 import numpy as np
 
-from src.flow import apply_fills, draw_fills, keep_fills
-from src.strategies import quotes
+from avellaneda_stoikov.flow import apply_fills, draw_fills, keep_fills
+from avellaneda_stoikov.strategies import quotes, quotes_noskew
 
 
 def _run(paths, quote_fn, A, k, dt, rng, q_0, pi, tau, rng_info):
@@ -74,13 +74,39 @@ def run_inventory(paths, gamma, sigma, k, A, T, dt, rng, q_0=0.0, pi=0.0, tau=0.
     return _run(paths, quote_fn, A, k, dt, rng, q_0, pi, tau, rng_info)
 
 
+def run_noskew(paths, gamma, sigma, k, A, T, dt, rng, q_0=0.0, pi=0.0, tau=0.1, rng_info=None):
+    """Run the inventory strategy's spread centered on the mid.
+
+    At each date the spread is the one ``run_inventory`` posts, so it still
+    declines toward ``T``. The quotes ignore inventory: a long position is
+    not pulled back toward zero. Against ``run_inventory`` the only
+    difference is the skew.
+
+    Fill and informed-flow conventions match ``run_inventory``. Pass a fresh
+    generator with the same seed if the strategies must see the same
+    uniforms.
+
+    Returns
+    -------
+    pnl, q_final, n_fills : ndarray, shape (n_paths,)
+    mean_spread : float
+        Time average of the quoted spread, equal to that of ``run_inventory``.
+    """
+
+    def quote_fn(mid, q, t):
+        return quotes_noskew(mid, gamma, sigma, k, T, t)
+
+    return _run(paths, quote_fn, A, k, dt, rng, q_0, pi, tau, rng_info)
+
+
 def run_symmetric(paths, spread, A, k, dt, rng, q_0=0.0, pi=0.0, tau=0.1, rng_info=None):
     """Run the symmetric benchmark on the same paths as ``run_inventory``.
 
     Quotes are ``mid ± spread / 2`` at every date. ``spread`` should be the
-    average spread quoted by the inventory strategy, so the comparison isolates
-    inventory skew from the choice of spread width. There is no reservation
-    price: a long inventory is not pulled back toward zero.
+    average spread quoted by the inventory strategy. There is no reservation
+    price: a long inventory is not pulled back toward zero. This book differs
+    from ``run_inventory`` by the skew and by the constant spread. Use
+    ``run_noskew`` to remove the skew alone.
 
     Fill and informed-flow conventions match ``run_inventory``. Pass a fresh
     generator with the same seed if the two strategies must see the same

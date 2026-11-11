@@ -1,7 +1,7 @@
 import numpy as np
 
-from src.price import simulate_mid_price
-from src.simulator import run_inventory, run_symmetric
+from avellaneda_stoikov.price import simulate_mid_price
+from avellaneda_stoikov.simulator import run_inventory, run_noskew, run_symmetric
 
 
 def test_no_arrivals_leave_wealth_and_inventory_at_zero():
@@ -14,6 +14,20 @@ def test_no_arrivals_leave_wealth_and_inventory_at_zero():
     assert np.all(q == 0.0)
     assert np.all(fills == 0.0)
     assert abs(spread - 1.491770422751424) < 1e-12
+
+
+def test_noskew_posts_the_inventory_spread_and_holds_more_inventory():
+    paths = simulate_mid_price(100.0, 2.0, 1.0, 0.005, 1000, np.random.default_rng(0))
+    _, q, _, spread = run_inventory(
+        paths, gamma=0.1, sigma=2.0, k=1.5, A=140.0, T=1.0, dt=0.005,
+        rng=np.random.default_rng(1),
+    )
+    _, q_n, _, spread_n = run_noskew(
+        paths, gamma=0.1, sigma=2.0, k=1.5, A=140.0, T=1.0, dt=0.005,
+        rng=np.random.default_rng(1),
+    )
+    assert abs(spread_n - spread) < 1e-12
+    assert q_n.std() > 2 * q.std()
 
 
 def test_symmetric_spread_is_the_inventory_average():
