@@ -2,11 +2,15 @@
 
 A discrete-time simulation of Avellaneda and Stoikov (2008). The inventory strategy differs from a mid-centered constant spread in two ways: it skews both quotes with inventory, and its spread declines toward expiry. A third book, with the declining spread and no skew, separates the two. The extension, which the paper does not treat, is a fraction of informed clients who trade only when the quote is on the wrong side of a future mid.
 
+The research question is whether inventory control still improves the mean–risk comparison under this informed-flow filter, and how much of the difference comes from the skew versus the spread schedule. The study first compares the uninformed setting with the published simulations, then varies risk aversion, the informed fraction, volatility, and the informed horizon. These are simulation results under a specified flow model; there is no calibration to market data.
+
 NumPy only. The mid is an arithmetic random walk. Execution probabilities are Bernoulli. The replication uses 1,000 paths, the sample size of the paper. The comparisons use 20,000. Seeds are fixed.
 
 At γ = 0.1 with no informed flow, the skew costs 3.12 ± 0.16 of mean profit and halves P&L volatility. The declining spread costs 0.20 ± 0.06. With informed clients the skew turns into a gain: 0.61 ± 0.13 at π = 0.5 and 1.33 ± 0.10 at π = 1. At γ = 1 and π = 1 the declining spread costs 0.52 ± 0.02, because informed fills pile up where it is tight, and the skew earns 0.32 ± 0.02 of that back. The constant wide spread barely trades.
 
 ## Quotes
+
+The original agent maximizes expected terminal exponential utility, E[−exp(−γ(X_T + q_T S_T))], where X is cash and γ > 0 is absolute risk aversion. A lower mean profit can therefore be consistent with the agent's objective if risk falls. This implementation uses the approximate quoting rule in equations (29)–(30), rather than solving the full Hamilton–Jacobi–Bellman equation. See [Avellaneda and Stoikov (2008), sections 3.1–3.2](https://doi.org/10.1080/14697680701381228). The experiments report mean wealth and dispersion; they do not estimate expected exponential utility.
 
 The mid has no drift. Over a step of length dt it moves by ±σ√dt.
 
@@ -38,6 +42,8 @@ Inventory minus no-skew is the effect of the skew. No-skew minus symmetric is th
 
 Each side fills with probability min(λ(δ) dt, 1), from an independent draw. Both sides can fill in one step. A bid fill buys one share. An ask fill sells one share. Terminal wealth is cash plus leftover inventory marked at the final mid.
 
+This is a Bernoulli approximation to Poisson arrivals, with at most one fill per side per step. It uses λ dt, rather than the Poisson probability 1 − exp(−λ dt) of at least one arrival. The cap changes the arrival rule whenever λ dt exceeds one, which can occur when the inventory skew moves a quote through the mid. The tables use q₀ = 0 and zero initial cash, so terminal wealth equals profit; the simulator's returned wealth would include the initial position's value if q₀ were nonzero.
+
 Parameters of the paper: s₀ = 100, T = 1, σ = 2, dt = 0.005, k = 1.5, A = 140, q₀ = 0, 1,000 paths.
 
 ## Match to the paper
@@ -61,9 +67,11 @@ Means sit on the published figures. Standard deviations differ by a few percent,
 
 A candidate fill, already drawn from λ(δ) dt, is informed with probability π. The label is drawn from a second generator, so π = 0 does not move the table above. An informed seller hits the bid only if it is strictly above the mid τ ahead. An informed buyer lifts the ask only if it is strictly below that mid. Otherwise the order is cancelled. Uninformed fills stand. The quote is computed before that future mid is read. Past T, the future mid is s_T.
 
-Horizon τ = 0.1 unless a table says otherwise. One step moves the mid by σ√dt ≈ 0.14, less than a half-spread of about 0.75, so a one-step horizon would never trigger an informed trade.
+Horizon τ = 0.1 unless a table says otherwise. At σ = 2, one step moves the mid by σ√dt ≈ 0.14, less than the half-spreads of the mid-centered books in the reported grids. Those books would have no informed fills with a one-step horizon. An inventory-skewed quote can be closer to, or through, the mid, so that conclusion does not apply to every inventory state. The code rounds τ / dt to an integer number of steps and clips the look-ahead at T.
 
 σ = 2, 20,000 paths. The three books share paths and the same random draws, so each gap is the mean of a pathwise difference, not a comparison of two separate intervals. Skew is inventory minus no-skew. Decline is no-skew minus symmetric.
+
+The path, candidate-fill, and informed-label seeds are 0, 1, and 2. Every reported ± is an approximate 95% Monte Carlo half-width, 1.96 × std / √N; for a gap, std is computed on the pathwise differences. These intervals measure sampling uncertainty for the fixed model and parameters. They do not cover discretization error or model misspecification, and no adjustment is made for the multiple comparisons across the grids. The skew and decline gaps add exactly along this comparison sequence; their values need not be unchanged under a different spread benchmark.
 
 | γ | π | Inventory | No skew | Symmetric | Skew | Decline |
 |---:|---:|---:|---:|---:|---:|---:|
@@ -162,9 +170,11 @@ The quotes do not depend on π. The spread is the Avellaneda-Stoikov spread, bui
 
 The informed trader is stylized. He cancels when the quote is not through the future mid, rather than hitting a side whenever he has a signal. After T, that future mid is frozen at s_T.
 
+The quoted intervals do not establish convergence as dt tends to zero. The Bernoulli rule, its probability cap, and the discrete price increments can affect executions. Varying dt while holding the physical horizons fixed is a remaining robustness check.
+
 Each fill is one unit. There are no fees and no other market maker. Inventory is unbounded. A quote is also revised with no lag: the next step replaces it before anyone can hit a stale price. Lehalle and Mounjid (2017) show that this lag is a cost of its own. An informed flow can lift a limit order in the time it takes to cancel it.
 
-The mid is an input. A quote never waits in a queue, and no trade moves the price. The two gaps above are the reference for posting these same quotes as limit orders in a book, where the mid is the book's own mid (Cont, Stoikov and Talreja, 2010). What should carry over is the sign of each gap: the skew helps once clients are informed, and a spread that tightens is where those clients trade. The value of π should not. Here it is the share of candidate fills that are informed. In a book it will be a share of the order flow, and the two will not be the same number. The package exposes `quotes`, so that book can post them without copying the formula.
+The mid is an input. A quote never waits in a queue, and no trade moves the price. The two gaps above provide a reference for a future experiment posting these same quotes as limit orders in a book, where the mid is the book's own mid (Cont, Stoikov and Talreja, 2010). Whether the signs of the gaps survive queueing, competing liquidity, and endogenous price changes remains to be tested. Even here, an informed fraction of π = 0.5 does not make the skew profitable at every γ and σ. Here π is the informed-label probability for candidate fills before filtering, rather than the informed share of executed trades. A share of incoming order flow in a book would be another quantity. The package exposes `quotes`, so that book can post them without copying the formula.
 
 ## Layout
 
@@ -197,7 +207,7 @@ python3 experiments/make_figures.py
 
 ## Reference
 
-Avellaneda, M. and Stoikov, S. (2008). High-frequency trading in a limit order book. *Quantitative Finance* 8(3), 217–224.
+Avellaneda, M. and Stoikov, S. (2008). High-frequency trading in a limit order book. *Quantitative Finance* 8(3), 217–224. [doi:10.1080/14697680701381228](https://doi.org/10.1080/14697680701381228).
 
 Cont, R., Stoikov, S. and Talreja, R. (2010). A stochastic model for order book dynamics. *Operations Research* 58(3), 549–563.
 
